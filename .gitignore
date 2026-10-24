@@ -1,0 +1,30 @@
+# Gizli ayarlar (depoya sadece .env.example girer)
+.env
+
+# Yarışma belgeleri (depoya girmez)
+sartname.pdf
+sartname.pdf.pdf
+Claude's Plan*.pdf
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+
+# Node / frontend derleme çıktısı
+node_modules/
+dist/
+
+# Model ağırlıkları ve yerel veritabanı (Docker içinde oluşur)
+models/
+*.gguf
+*.db
+*.sqlite3
+
+# Editör ve işletim sistemi dosyaları
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
