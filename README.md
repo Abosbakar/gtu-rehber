@@ -14,12 +14,21 @@ GTÜ öğrencilerinin akademik süreçlerdeki sorularını yönetmeliğe, akadem
 
 Öğrenci durumunu doğal dille yazar (ör. _"Hastalandım, AERO408 vizesine giremedim"_). GTÜ Rehber:
 
-1. Durumu sınıflandırır: mazeret sınavı, ders ekle-bırak, kayıt dondurma, staj başvurusu, not itirazı. Emin olmadığında öğrenci işlerine yönlendirir.
-2. Yönetmelikteki ilgili maddeyi bulup gösterir (BM25 arama).
+1. Durumu sınıflandırır (aşağıdaki kapsam tablosu). Emin olmadığında öğrenci işlerine yönlendirir.
+2. Yönetmelik ve yönergelerdeki ilgili maddeyi bulup gösterir (BM25 arama).
 3. Akademik takvime göre son başvuru gününü hesaplar.
 4. Diğer öğrencilerin onaylanmış deneyimlerini **"resmi değil"** etiketiyle ekler.
 5. Gerekli belgeleri listeler ve doldurulmuş dilekçeyi PDF olarak verir.
 6. Öğrenci kendi deneyimini paylaşabilir; isimler kayıttan önce silinir, yönetici onayından sonra yayınlanır.
+
+## Kapsam
+
+| Seviye | Konular | Asistan ne verir |
+|---|---|---|
+| **Tam destek** | Mazeret sınavı, ders ekle-bırak, kayıt dondurma, staj başvurusu, not itirazı | Madde + son başvuru günü + deneyimler + belge listesi + doldurulmuş dilekçe PDF |
+| **Bilgi desteği** | Yatay/dikey geçiş, çift anadal, yandal, yaz okulu, ders muafiyeti ve intibak, muafiyet sınavı, İngilizce hazırlık, Erasmus, azami süre ve ek sınav, mezuniyet ve diploma, KYK burs/kredi, kısmi zamanlı çalışma, engelli öğrenci sınav düzenlemeleri, danışmanlık | Madde + takvimde varsa tarih + deneyimler |
+
+Staj sorularında fakülte ve bölüme özel staj esasları kullanılır. Kayıt dondurma gibi durumlarda KYK burs/kredi üzerindeki etkisi de hatırlatılır. Tüm kaynakların listesi: [`data/KAYNAKLAR.md`](data/KAYNAKLAR.md).
 
 ## Mimari
 
@@ -51,7 +60,7 @@ docker compose up --build
 ```
 backend/    FastAPI arka uç
 frontend/   React + Vite ön yüz
-data/       Yönetmelik, staj yönergesi ve akademik takvim PDF'leri
+data/       GTÜ yönetmelik/yönergeleri, staj esasları, akademik takvim, YÖK ve KYK yönetmelikleri
 docs/       Geliştirme notları
 ```
 
