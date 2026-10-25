@@ -201,7 +201,13 @@ class RegulationIndex:
             if score > 0:
                 scored.append((score, chunk))
         scored.sort(key=lambda x: x[0], reverse=True)
-        return [
-            Hit(c.doc.file, c.doc.title, c.doc.code, c.label, c.text, round(s, 2))
-            for s, c in scored[:top_k]
-        ]
+        hits, seen = [], set()
+        for s, c in scored:
+            # Uzun maddeler parçalara bölünür; her maddeden sadece en iyi parça gösterilir
+            if (c.doc.file, c.label) in seen:
+                continue
+            seen.add((c.doc.file, c.label))
+            hits.append(Hit(c.doc.file, c.doc.title, c.doc.code, c.label, c.text, round(s, 2)))
+            if len(hits) == top_k:
+                break
+        return hits

@@ -13,7 +13,7 @@ class Settings(BaseSettings):
 
     # Yerel dil modeli
     model_path: str = "/models/qwen2.5-1.5b-instruct-q4_k_m.gguf"
-    llm_threads: int = 4
+    llm_threads: int = 0  # 0 = otomatik
     llm_context: int = 4096
 
     # Veri ve veritabanı

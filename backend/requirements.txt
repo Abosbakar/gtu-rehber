@@ -2,3 +2,7 @@ fastapi==0.115.6
 uvicorn[standard]==0.32.1
 pydantic-settings==2.7.0
 pypdf==5.1.0
+# Hazır CPU wheel'i kullanılır; kaynak koddan derleme yapılmaz
+--extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu
+--only-binary=llama-cpp-python
+llama-cpp-python==0.3.19
