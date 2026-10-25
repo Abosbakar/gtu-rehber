@@ -1,6 +1,7 @@
 """GTÜ Rehber arka uç API'si."""
 
 import logging
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
@@ -8,12 +9,21 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from .config import get_settings
+from .search import RegulationIndex
 
 settings = get_settings()
 logging.basicConfig(level=logging.DEBUG if settings.debug else logging.INFO)
 logger = logging.getLogger("gtu_rehber")
 
-app = FastAPI(title="GTÜ Rehber API", version="0.1.0", debug=settings.debug)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Belgeler açılışta bir kez okunur ve indekslenir
+    app.state.index = RegulationIndex(settings.data_dir)
+    yield
+
+
+app = FastAPI(title="GTÜ Rehber API", version="0.1.0", debug=settings.debug, lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -43,5 +53,10 @@ async def unexpected_error(_: Request, exc: Exception) -> JSONResponse:
 
 
 @app.get("/health")
-def health() -> dict:
-    return {"status": "ok"}
+def health(request: Request) -> dict:
+    index: RegulationIndex = request.app.state.index
+    return {
+        "status": "ok",
+        "documents": index.loaded_documents,
+        "articles": len(index.chunks),
+    }
