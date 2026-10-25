@@ -10,6 +10,7 @@ GTÜ belgelerinin kaynağı: [GTÜ Kalite – Yönetmelikler](https://www.gtu.ed
 |---|---|---|
 | `yonetmelik.pdf` | GTÜ Ön Lisans ve Lisans Eğitim-Öğretim Yönetmeliği (YN-0001, R7, 01.10.2024) | GTÜ |
 | `akademik-takvim-2026-2027.pdf` | GTÜ 2026-2027 Akademik Takvim | [GTÜ ÖİDB](https://www.gtu.edu.tr/icerik/1318/436/akademik-takvim.aspx) (web sayfası PDF'e çevrildi) |
+| `akademik-takvim-2026-2027.json` | Aynı takvimin tarih hesabında kullanılan yapılandırılmış hali (lisans etkinlikleri ve resmi tatiller) | `backend/scripts/extract_calendar.py` ile aynı sayfadan üretildi |
 | `yaz-ogretimi-yonetmeligi.pdf` | GTÜ Yaz Öğretimi Yönetmeliği (YN-0015, R1) | GTÜ |
 
 ## GTÜ öğrenci yönergeleri

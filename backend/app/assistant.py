@@ -5,9 +5,11 @@ Madde metni aramadan gelir, dil modeli sadece kısa açıklama cümlelerini yaza
 
 import re
 from dataclasses import asdict
+from datetime import date
 
-from . import extract
+from . import deadlines, extract
 from .classifier import classify, contains, fold_words
+from .db import ExperienceStore
 from .llm import LocalLLM
 from .search import Hit, RegulationIndex
 from .topics import Topic
@@ -85,19 +87,30 @@ def _article_summary(hit: Hit, sentences: int = 2) -> str:
     return f"{hit.title}, {hit.label.split(' –')[0]}: \"{summary}\""
 
 
-def _write_answer(llm: LocalLLM, question: str, topic: Topic, hit: Hit | None, office: str) -> tuple[str, str]:
+def _write_answer(
+    llm: LocalLLM, question: str, topic: Topic, hit: Hit | None, office: str, deadline: dict | None
+) -> tuple[str, str]:
     intro = _intro(llm, question, topic)
     parts = [intro or f"Durumunuz \"{topic.name}\" kapsamında görünüyor."]
     if topic.key_facts:
         parts += topic.key_facts
     elif hit:
         parts.append(_article_summary(hit))
+    if deadline:
+        parts.append(deadlines.deadline_sentence(deadline))
     if office:
         parts.append(f"Başvuru yeri: {office}.")
     return " ".join(parts), ("dil_modeli+kural" if intro else "kural")
 
 
-def answer(question: str, index: RegulationIndex, llm: LocalLLM) -> dict:
+def answer(
+    question: str,
+    index: RegulationIndex,
+    llm: LocalLLM,
+    calendar: deadlines.Calendar,
+    store: ExperienceStore,
+    today: date,
+) -> dict:
     result = classify(question, llm, index)
     topic = result.topic
     base = {
@@ -119,7 +132,9 @@ def answer(question: str, index: RegulationIndex, llm: LocalLLM) -> dict:
         extracted["reason"] = extract.reason(question, llm)
 
     hits = index.search(f"{question} {topic.query}", files=files, top_k=3)
-    text, source = _write_answer(llm, question, topic, hits[0] if hits else None, topic.office)
+    # Süre koddan hesaplanır, dil modeli tarih üretmez
+    deadline = deadlines.compute(topic.id, question, calendar, today)
+    text, source = _write_answer(llm, question, topic, hits[0] if hits else None, topic.office, deadline)
 
     related = []
     if topic.side_search:
@@ -139,4 +154,9 @@ def answer(question: str, index: RegulationIndex, llm: LocalLLM) -> dict:
         "notes": list(topic.notes),
         "related": related,
         "extracted": extracted,
+        "deadline": deadline,
+        "calendar": calendar.upcoming(deadlines.CALENDAR_KEYWORDS.get(topic.id, ()), today)
+        if topic.id in deadlines.CALENDAR_KEYWORDS else [],
+        "experiences": store.approved(topic.id),
+        "petition_available": topic.level == "tam",
     }

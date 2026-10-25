@@ -23,8 +23,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY data ./data
 COPY backend/app ./app
 
+# Deneyim veritabanı bu klasörde durur; docker compose burayı bir volume'a bağlar
+RUN mkdir -p /app/db
+
 ENV MODEL_PATH=/models/${MODEL_FILE} \
-    DATA_DIR=/app/data
+    DATA_DIR=/app/data \
+    DB_PATH=/app/db/rehber.db
 
 EXPOSE 8000
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

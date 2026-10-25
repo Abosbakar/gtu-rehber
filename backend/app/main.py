@@ -2,6 +2,8 @@
 
 import logging
 from contextlib import asynccontextmanager
+from datetime import date
+from pathlib import Path
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
@@ -11,6 +13,8 @@ from pydantic import BaseModel, Field, field_validator
 
 from . import assistant
 from .config import get_settings
+from .db import ExperienceStore
+from .deadlines import Calendar
 from .llm import LocalLLM
 from .search import RegulationIndex
 
@@ -23,6 +27,8 @@ logger = logging.getLogger("gtu_rehber")
 async def lifespan(app: FastAPI):
     # Belgeler açılışta bir kez okunur ve indekslenir
     app.state.index = RegulationIndex(settings.data_dir)
+    app.state.calendar = Calendar.load(Path(settings.data_dir) / "akademik-takvim-2026-2027.json")
+    app.state.store = ExperienceStore(settings.db_path)
     # Model arka planda yüklenir; bu sırada API anahtar kelimelerle çalışmaya devam eder
     app.state.llm = LocalLLM(settings.model_path, settings.llm_threads, settings.llm_context)
     app.state.llm.load_in_background()
@@ -68,6 +74,7 @@ def health(request: Request) -> dict:
         "documents": index.loaded_documents,
         "articles": len(index.chunks),
         "model": request.app.state.llm.status,
+        "calendar_events": len(request.app.state.calendar.events),
     }
 
 
@@ -85,4 +92,10 @@ class AskRequest(BaseModel):
 
 @app.post("/ask")
 def ask(body: AskRequest, request: Request) -> dict:
-    return assistant.answer(body.question, request.app.state.index, request.app.state.llm)
+    state = request.app.state
+    return assistant.answer(body.question, state.index, state.llm, state.calendar, state.store, today())
+
+
+def today() -> date:
+    # Demo ve testlerde sabit bir gün kullanmak için REFERENCE_DATE ayarlanabilir
+    return date.fromisoformat(settings.reference_date) if settings.reference_date else date.today()

@@ -23,6 +23,9 @@ class Settings(BaseSettings):
     # Yönetici paneli anahtarı
     admin_key: str = ""
 
+    # Boşsa bugünün tarihi kullanılır (YYYY-AA-GG)
+    reference_date: str = ""
+
     debug: bool = False
 
     @property
