@@ -1,0 +1,9 @@
+.git
+.env
+**/.venv
+**/__pycache__
+**/node_modules
+**/dist
+*.pdf.pdf
+Claude's Plan*.pdf
+sartname.pdf
