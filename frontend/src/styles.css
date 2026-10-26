@@ -361,3 +361,104 @@ button {
   color: var(--muted);
   margin-top: 10px;
 }
+
+/* Deneyim paylaşma ve yönetici sayfası */
+.ghost {
+  background: #fff;
+  color: var(--navy);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 0.85rem;
+}
+
+.ghost:disabled {
+  color: #1f8a4c;
+  cursor: default;
+}
+
+.confirm-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.share summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--navy);
+}
+
+.share textarea,
+.admin-login input {
+  width: 100%;
+  font: inherit;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-top: 6px;
+}
+
+.form-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.form-row button[type="submit"],
+.admin-login button,
+.admin-item .form-row button:not(.ghost) {
+  background: var(--navy);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 14px;
+}
+
+.form-row button:disabled,
+.admin-login button:disabled {
+  opacity: 0.5;
+}
+
+.admin-login button {
+  margin-top: 8px;
+}
+
+.form-error {
+  color: #8a1024;
+  font-size: 0.85rem;
+}
+
+.share-result p {
+  margin: 6px 0;
+}
+
+.tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.tabs button {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 6px 14px;
+}
+
+.tabs button.active {
+  background: var(--navy);
+  color: #fff;
+  border-color: var(--navy);
+}
+
+.tabs .logout {
+  margin-left: auto;
+}
+
+.admin-item p {
+  margin: 8px 0;
+}

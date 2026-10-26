@@ -1,3 +1,5 @@
+import { ExperienceList, ShareExperience } from "./Experiences.jsx";
+
 const STATUS_CLASS = {
   açık: "ok",
   "son gün bugün": "warn",
@@ -38,22 +40,6 @@ function Sources({ sources }) {
           </summary>
           <p>{s.text}</p>
         </details>
-      ))}
-    </section>
-  );
-}
-
-function Experiences({ items }) {
-  if (!items?.length) return null;
-  return (
-    <section className="card experiences">
-      <h3>Diğer öğrencilerin deneyimleri</h3>
-      {items.map((e) => (
-        <blockquote key={e.id}>
-          <span className="unofficial">{e.label}</span>
-          <p>{e.text}</p>
-          {e.confirmations > 0 && <small>{e.confirmations} öğrenci "ben de yaşadım" dedi</small>}
-        </blockquote>
       ))}
     </section>
   );
@@ -124,7 +110,8 @@ export default function AnswerCard({ data }) {
       )}
 
       <Sources sources={data.sources} />
-      <Experiences items={data.experiences} />
+      <ExperienceList items={data.experiences || []} />
+      <ShareExperience topic={data.topic} />
 
       <p className="disclaimer">{data.disclaimer}</p>
     </div>

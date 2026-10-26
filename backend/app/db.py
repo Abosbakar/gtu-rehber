@@ -61,6 +61,35 @@ class ExperienceStore:
             ).fetchall()
         return [{**dict(r), "label": LABEL} for r in rows]
 
+    def get(self, exp_id: int) -> dict | None:
+        with self._connect() as conn:
+            row = conn.execute("SELECT * FROM experiences WHERE id = ?", (exp_id,)).fetchone()
+        return dict(row) if row else None
+
+    def by_status(self, status: str, limit: int = 100) -> list[dict]:
+        with self._connect() as conn:
+            rows = conn.execute(
+                "SELECT * FROM experiences WHERE status = ? ORDER BY created_at DESC LIMIT ?",
+                (status, limit),
+            ).fetchall()
+        return [dict(r) for r in rows]
+
+    def set_status(self, exp_id: int, status: str) -> bool:
+        with self._connect() as conn:
+            cur = conn.execute("UPDATE experiences SET status = ? WHERE id = ?", (status, exp_id))
+            return cur.rowcount == 1
+
+    def confirm(self, exp_id: int) -> int | None:
+        """'Ben de yaşadım' sayısını artırır; sadece onaylı deneyimlerde çalışır."""
+        with self._connect() as conn:
+            cur = conn.execute(
+                "UPDATE experiences SET confirmations = confirmations + 1 WHERE id = ? AND status = 'approved'",
+                (exp_id,),
+            )
+            if cur.rowcount != 1:
+                return None
+            return conn.execute("SELECT confirmations FROM experiences WHERE id = ?", (exp_id,)).fetchone()[0]
+
     def count(self) -> int:
         with self._connect() as conn:
             return conn.execute("SELECT COUNT(*) FROM experiences").fetchone()[0]

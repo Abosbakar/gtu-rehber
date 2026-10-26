@@ -1,6 +1,7 @@
 """GTÜ Rehber arka uç API'si."""
 
 import logging
+import secrets
 from contextlib import asynccontextmanager
 from datetime import date
 from pathlib import Path
@@ -10,11 +11,13 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, field_validator
+from starlette.exceptions import HTTPException
 
 from . import assistant
 from .config import get_settings
 from .db import ExperienceStore
 from .deadlines import Calendar
+from .experiences import router as experiences_router
 from .llm import LocalLLM
 from .search import RegulationIndex
 
@@ -29,6 +32,10 @@ async def lifespan(app: FastAPI):
     app.state.index = RegulationIndex(settings.data_dir)
     app.state.calendar = Calendar.load(Path(settings.data_dir) / "akademik-takvim-2026-2027.json")
     app.state.store = ExperienceStore(settings.db_path)
+    # ADMIN_KEY verilmemişse depoya şifre yazmamak için her açılışta rastgele anahtar üretilir
+    app.state.admin_key = settings.admin_key or secrets.token_urlsafe(12)
+    if not settings.admin_key:
+        logger.warning("ADMIN_KEY ayarlanmamış. Bu oturumun yönetici anahtarı: %s", app.state.admin_key)
     # Model arka planda yüklenir; bu sırada API anahtar kelimelerle çalışmaya devam eder
     app.state.llm = LocalLLM(settings.model_path, settings.llm_threads, settings.llm_context)
     app.state.llm.load_in_background()
@@ -36,6 +43,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="GTÜ Rehber API", version="0.1.0", debug=settings.debug, lifespan=lifespan)
+app.include_router(experiences_router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -55,6 +63,12 @@ async def validation_error(_: Request, exc: RequestValidationError) -> JSONRespo
         else "İstek okunamadı. Lütfen geçerli bir JSON gönderin."
     )
     return JSONResponse(status_code=422, content={"error": message})
+
+
+@app.exception_handler(HTTPException)
+async def http_error(_: Request, exc: HTTPException) -> JSONResponse:
+    # Tüm hata cevapları aynı biçimde: {"error": "..."}
+    return JSONResponse(status_code=exc.status_code, content={"error": exc.detail})
 
 
 @app.exception_handler(Exception)

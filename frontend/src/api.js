@@ -33,3 +33,23 @@ export function ask(question) {
 export function health() {
   return request("/health");
 }
+
+export function shareExperience(topic, text) {
+  return request("/experiences", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ topic, text }),
+  });
+}
+
+export function confirmExperience(id) {
+  return request(`/experiences/${id}/confirm`, { method: "POST" });
+}
+
+export function adminList(key, status) {
+  return request(`/admin/experiences?status=${status}`, { headers: { "X-Admin-Key": key } });
+}
+
+export function adminDecide(key, id, action) {
+  return request(`/admin/experiences/${id}/${action}`, { method: "POST", headers: { "X-Admin-Key": key } });
+}
