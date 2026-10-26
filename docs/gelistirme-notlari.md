@@ -47,3 +47,25 @@ Bu dosya, README'deki "Yapay zekâyı nasıl kullandık" bölümü için gelişt
 - **Yavaşlık:** Cevaplar ilk başta 10–16 saniye sürüyordu. Model çekirdek sayısını otomatik seçecek şekilde ayarlanıp (`LLM_THREADS=0`) model çıktısı tek cümleye indirilince süre 1–3 saniyeye düştü.
 - **Takvim sayfasında karışık karakter kodlaması:** GTÜ'nün takvim sayfasında bazı hücreler Windows-1254, bazıları UTF-8 ile yazılmış; "Ağustos" gibi aylar okunamıyor, "14 Eylül–02 Ekim" yanlış yıla düşüyordu. Her hücre kendi kodlamasıyla çözülerek düzeltildi; "Yeni Yıl Tatili" ve "ﬁ" bitişik harfi de ayrıca ele alındı.
 - **Claude Code'un kendi hataları:** Dosyaları komut satırından otomatik düzenlerken iki kez kaçış karakterlerini (`\n`, `\b`) bozup sözdizimi hatasına yol açtı; testler ve derleme kontrolüyle hemen fark edilip düzeltildi.
+
+## Gün 3 – 26 Ekim 2026
+
+**Yapılanlar**
+- React + Vite sohbet arayüzü; nginx ile derlenmiş halde sunuluyor (geliştirme sunucusu yok).
+- `docker-compose.yml`: `docker compose up --build` ile iki servis; deneyim veritabanı Docker volume'unda, arka uç sağlıklı olmadan ön yüz başlamıyor.
+- Cevap kartları: son başvuru günü (durum rengiyle), gerekli belgeler, açılır yönetmelik maddeleri, KYK uyarısı, takvim, "resmi değil" etiketli deneyimler; aşamalı yükleniyor göstergesi ve hata/durum bantları.
+- Deneyim paylaşma: isimler kayıttan önce rollere çevriliyor, `/admin` sayfasından onaylanıyor, "Ben de yaşadım" sayacı tutuluyor.
+- Dilekçe: 5 konu için şablon, DejaVu fontlu PDF, sohbetten çıkan bilgilerle önceden doldurulan form; kişisel bilgiler kaydedilmiyor.
+- 50 otomatik test; tarayıcıda uçtan uca deneme (soru → paylaşım → onay → tekrar soru → ben de yaşadım → dilekçe indirme); sıfırdan `down -v` / `up --build` testi.
+
+**Karşılaşılan sorunlar ve çözümler**
+- **Ağdaki güvenlik duvarı npm'i engelledi:** `npm install` dakikalarca takıldı. Claude Code sertifika zincirini inceleyince ağda bir Fortinet güvenlik duvarının `registry.npmjs.org` trafiğini kendi sertifikasıyla açtığını buldu (dünkü Debian 403 hatasının da muhtemel nedeni). Sertifika kontrolünü kapatmak güvensiz olacağı için reddedildi; bunun yerine npm'in resmi aynası `registry.yarnpkg.com` `frontend/.npmrc` ile ayarlandı. Paket bütünlüğü `package-lock.json`'daki sha512 özetleriyle yine doğrulanıyor.
+- **Docker derlemesi "vite bulunamadı" hatası verdi:** Dockerfile `npm ci`'den önce `.npmrc`'yi kopyalamıyordu; npm engellenen sunucuya gidip bir npm hatası yüzünden "başarılı" görünerek çıkmıştı. `.npmrc` kopyalandı ve `npm ci`'den sonra vite'ın varlığı kontrol edilir hale getirildi.
+- **Yönetici anahtarı ve jüri:** Jüri `.env` oluşturmadan çalıştıracağı için anahtar boş kalacaktı. Depoya varsayılan şifre yazmak şartnameye aykırı olduğundan, anahtar boşsa her açılışta rastgele üretilip konteyner günlüğüne yazılıyor.
+- **Anonimleştirme ince ayarı:** İlk denemede "Danışmanım Ali Bey" ifadesindeki "Danışmanım" kelimesi de siliniyor, "Bölüm sekreteri [bölüm sekreteri]" diye rol tekrarlanıyor, "Arıkan'a" ekinin önünde boşluk kalıyordu. Önünde rol kelimesi olan adlar "[ad silindi]" ile değiştirildi, ekler düzeltildi ve her durum için test yazıldı.
+- **Dilekçe üslubu:** Şablonlar "…arz ederim. Gereğini saygılarımla arz ederim." diye tekrar ediyordu; gövde "talep ederim" ile bitirildi. PDF görüntüye çevrilip Türkçe karakterler ve düzen gözle kontrol edildi.
+- **Docker katman önbelleği:** Yazı tipi paketi model indirme adımından önce eklenince ~1 GB'lık model yeniden inecekti; kurulum model adımından sonraya taşındı.
+
+**Gün 4'e kalan küçük düzeltmeler**
+- PDF'lerden gelen bölünmüş kelimeler ("öğrenciler e") madde metninde görünüyor.
+- Örnek deneyimler: geliştiricinin kendi yazacağı deneyimler eklenecek (uydurma deneyim eklenmeyecek).
