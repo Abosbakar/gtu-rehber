@@ -53,3 +53,26 @@ export function adminList(key, status) {
 export function adminDecide(key, id, action) {
   return request(`/admin/experiences/${id}/${action}`, { method: "POST", headers: { "X-Admin-Key": key } });
 }
+
+export async function downloadPetition(values) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 30_000);
+  let res;
+  try {
+    res = await fetch(`${API_URL}/petition`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(values),
+      signal: controller.signal,
+    });
+  } catch {
+    throw new Error("Sunucuya ulaşılamadı. Lütfen tekrar deneyin.");
+  } finally {
+    clearTimeout(timer);
+  }
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || "Dilekçe oluşturulamadı.");
+  }
+  return res.blob();
+}

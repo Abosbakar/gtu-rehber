@@ -1,4 +1,5 @@
 import { ExperienceList, ShareExperience } from "./Experiences.jsx";
+import PetitionForm from "./PetitionForm.jsx";
 
 const STATUS_CLASS = {
   açık: "ok",
@@ -78,6 +79,8 @@ export default function AnswerCard({ data }) {
           )}
         </section>
       )}
+
+      {data.petition_available && <PetitionForm data={data} />}
 
       {(data.notes?.length > 0 || data.related?.length > 0) && (
         <section className="card notice">

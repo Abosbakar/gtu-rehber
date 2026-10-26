@@ -17,6 +17,9 @@ ARG MODEL_FILE=qwen2.5-1.5b-instruct-q4_k_m.gguf
 COPY backend/scripts/download_model.py /tmp/download_model.py
 RUN python /tmp/download_model.py "$MODEL_REPO" "$MODEL_FILE" /models
 
+# Dilekçe PDF'indeki Türkçe karakterler için DejaVu yazı tipi
+RUN apk add --no-cache font-dejavu
+
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 

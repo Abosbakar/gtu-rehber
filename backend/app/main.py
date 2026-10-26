@@ -9,7 +9,7 @@ from pathlib import Path
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel, Field, field_validator
 from starlette.exceptions import HTTPException
 
@@ -19,6 +19,7 @@ from .db import ExperienceStore
 from .deadlines import Calendar
 from .experiences import router as experiences_router
 from .llm import LocalLLM
+from .petition import PetitionData, PetitionError, build_pdf
 from .search import RegulationIndex
 
 settings = get_settings()
@@ -113,3 +114,31 @@ def ask(body: AskRequest, request: Request) -> dict:
 def today() -> date:
     # Demo ve testlerde sabit bir gün kullanmak için REFERENCE_DATE ayarlanabilir
     return date.fromisoformat(settings.reference_date) if settings.reference_date else date.today()
+
+
+class PetitionIn(BaseModel):
+    topic: str = Field(max_length=40)
+    full_name: str = Field(min_length=3, max_length=80)
+    student_no: str = Field(pattern=r"^\d{6,12}$")
+    department: str = Field(min_length=2, max_length=80)
+    course_code: str = Field(default="", max_length=20)
+    event_date: str = Field(default="", max_length=20)
+    reason: str = Field(default="", max_length=200)
+    details: str = Field(default="", max_length=400)
+    phone: str = Field(default="", max_length=20)
+    email: str = Field(default="", max_length=80)
+
+
+@app.post("/petition")
+def petition(body: PetitionIn) -> Response:
+    # Kişisel bilgiler kaydedilmez ve günlüğe yazılmaz; sadece PDF üretmek için kullanılır
+    try:
+        pdf = build_pdf(PetitionData(**body.model_dump()), today())
+    except PetitionError as exc:
+        return JSONResponse(status_code=400, content={"error": str(exc)})
+    filename = f"dilekce-{body.topic.replace('_', '-')}.pdf"
+    return Response(
+        content=pdf,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
