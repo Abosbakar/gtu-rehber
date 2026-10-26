@@ -165,3 +165,199 @@ button {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* Durum bantları */
+.banner {
+  margin: 12px 16px 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #fff6e0;
+  border: 1px solid #f1d58a;
+  font-size: 0.9rem;
+}
+
+.banner.error {
+  background: #fdecee;
+  border-color: #f5b5bf;
+  color: #8a1024;
+}
+
+/* Yükleniyor göstergesi */
+.loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+}
+
+.loading .elapsed {
+  margin-left: auto;
+  font-size: 0.8rem;
+}
+
+.dots {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.dots i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--navy);
+  animation: blink 1.2s infinite ease-in-out;
+}
+
+.dots i:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.dots i:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes blink {
+  0%, 80%, 100% { opacity: 0.25; transform: scale(0.8); }
+  40% { opacity: 1; transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dots i { animation: none; opacity: 0.6; }
+}
+
+/* Cevap kartları */
+.topic-line {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.level {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.answer {
+  font-size: 1rem;
+}
+
+.unknown {
+  border-left: 4px solid #f1d58a;
+}
+
+.card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-top: 10px;
+  background: #fbfcff;
+}
+
+.card h3 {
+  margin: 0 0 6px;
+  font-size: 0.9rem;
+  color: var(--navy);
+}
+
+.card p,
+.card ul {
+  margin: 4px 0;
+}
+
+.card ul {
+  padding-left: 20px;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.deadline {
+  border-left: 5px solid var(--navy);
+}
+
+.deadline .big {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 2px 0;
+}
+
+.deadline .status {
+  font-weight: 600;
+}
+
+.deadline.ok { border-left-color: #1f8a4c; }
+.deadline.ok .status { color: #1f8a4c; }
+.deadline.warn { border-left-color: #d98a00; }
+.deadline.warn .status { color: #a86a00; }
+.deadline.late { border-left-color: var(--red); }
+.deadline.late .status { color: var(--red); }
+.deadline.info { border-left-color: #2d6cdf; }
+.deadline.info .status { color: #2d6cdf; }
+
+.notice {
+  background: #fff9eb;
+  border-color: #f1d58a;
+}
+
+.source {
+  border-top: 1px solid var(--border);
+  padding: 6px 0;
+}
+
+.source:first-of-type {
+  border-top: none;
+}
+
+.source summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.source .code {
+  background: var(--user);
+  color: var(--navy);
+  border-radius: 6px;
+  padding: 1px 6px;
+  font-size: 0.75rem;
+}
+
+.source .doc {
+  display: block;
+  font-weight: 400;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.source p {
+  font-size: 0.9rem;
+  white-space: pre-wrap;
+}
+
+.experiences blockquote {
+  margin: 8px 0 0;
+  padding: 8px 10px;
+  border-left: 4px solid #9aa6c2;
+  background: #fff;
+  border-radius: 6px;
+}
+
+.unofficial {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #8a5a00;
+  background: #fff1cc;
+  border-radius: 6px;
+  padding: 1px 6px;
+}
+
+.disclaimer {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-top: 10px;
+}

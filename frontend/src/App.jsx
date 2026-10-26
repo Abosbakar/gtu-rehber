@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { ask } from "./api.js";
+import { ask, health } from "./api.js";
+import AnswerCard from "./components/AnswerCard.jsx";
+import Loading from "./components/Loading.jsx";
 
 const EXAMPLES = [
   "Hastalandım, Pazartesi AERO408 vizesine giremedim",
@@ -12,7 +14,25 @@ export default function App() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
+  const [status, setStatus] = useState(null); // /health cevabı ya da "offline"
   const endRef = useRef(null);
+
+  // Model yüklenene kadar durumu birkaç saniyede bir kontrol et
+  useEffect(() => {
+    let timer;
+    const check = () =>
+      health()
+        .then((h) => {
+          setStatus(h);
+          if (h.model === "loading") timer = setTimeout(check, 3000);
+        })
+        .catch(() => {
+          setStatus("offline");
+          timer = setTimeout(check, 5000);
+        });
+    check();
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -46,6 +66,16 @@ export default function App() {
         </div>
       </header>
 
+      {status === "offline" && (
+        <div className="banner error">Sunucuya ulaşılamıyor. Arka uç başlatılıyor olabilir, birkaç saniye içinde tekrar denenecek.</div>
+      )}
+      {status?.model === "loading" && (
+        <div className="banner">Yapay zekâ modeli yükleniyor; bu sırada cevaplar yalnızca kurallarla hazırlanır.</div>
+      )}
+      {status?.model === "unavailable" && (
+        <div className="banner">Yapay zekâ modeli kullanılamıyor; cevaplar yalnızca kurallarla hazırlanıyor.</div>
+      )}
+
       <main className="chat">
         {messages.length === 0 && (
           <section className="welcome">
@@ -67,13 +97,10 @@ export default function App() {
           ) : m.role === "error" ? (
             <div key={i} className="bubble error">{m.text}</div>
           ) : (
-            <div key={i} className="bubble assistant">
-              {m.data.topic && <span className="badge">{m.data.topic.name}</span>}
-              <p>{m.data.answer}</p>
-            </div>
+            <AnswerCard key={i} data={m.data} />
           ),
         )}
-        {busy && <div className="bubble assistant">Cevap hazırlanıyor…</div>}
+        {busy && <Loading />}
         <div ref={endRef} />
       </main>
 
