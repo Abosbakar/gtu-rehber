@@ -69,3 +69,17 @@ Bu dosya, README'deki "Yapay zekâyı nasıl kullandık" bölümü için gelişt
 **Gün 4'e kalan küçük düzeltmeler**
 - PDF'lerden gelen bölünmüş kelimeler ("öğrenciler e") madde metninde görünüyor.
 - Örnek deneyimler: geliştiricinin kendi yazacağı deneyimler eklenecek (uydurma deneyim eklenmeyecek).
+
+## Gün 4 – 27 Ekim 2026
+
+**Yapılanlar**
+- PDF'ten çıkarılan metindeki kopuk harfler ("öğrenciler e" → "öğrencilere", "b ir" → "bir") kurallarla birleştirildi; tek harflik kopmalar 139'dan 37'ye indi.
+- Deneyimler aynı konu içinde soruya benzerliğe göre sıralanıyor (geliştiricinin "uçak mühendisliği deneyimi bilgisayar sorusunda da çıkar mı?" sorusu üzerine).
+- README son hali: problem, çözüm, çalıştırma, yönetici anahtarı, sorun giderme, mimari, gizlilik, sınırlamalar, "Yapay zekâyı nasıl kullandık".
+- Temiz klon testi: depo GitHub'dan boş klasöre klonlandı, `.env` olmadan ve Docker önbelleği kullanılmadan (`--no-cache`) derlendi (6 dakika, model sıfırdan indi), tek komutla açıldı; soru, süre hesabı ve dilekçe çalıştı.
+- Demo video senaryosu (`docs/demo-senaryosu.md`) ve şartname kontrol listesi.
+
+**Karşılaşılan sorunlar ve çözümler**
+- **Kopuk harflerde belirsizlik:** "der s almalar" gibi bazı kopmalar kurallarla iki şekilde de okunabiliyor ("ders almalar" / "der salmalar"). Tek bir istisna için 100'den fazla düzeltmeden vazgeçmemek adına bu sınırlama kabul edildi.
+- **Şartname taramasında yanlış alarm:** Depoda "YOLO" araması "biyoloji" kelimesine takıldı; kontrol edildi, YOLO ya da bulut yapay zekâ kütüphanesi yok.
+- **README'deki sayıların doğrulanması:** Test sayısı ilk taslakta 51 yazılmıştı, sayınca 52 çıktı ve düzeltildi.
