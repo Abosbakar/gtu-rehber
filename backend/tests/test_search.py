@@ -41,3 +41,10 @@ def test_dogru_madde_bulunur(index, query, files, expected):
 def test_bos_sorgu_hata_vermez(index):
     assert index.search("   ") == []
     assert index.search("ve ile bir") == []
+
+
+def test_pdf_kopuk_harfleri_birlestirilir():
+    from app.search import _fix_split_words
+
+    assert _fix_split_words("öğrenciler e, başka b ir ders") == "öğrencilere, başka bir ders"
+    assert _fix_split_words("o dönem için en az a) b)") == "o dönem için en az a) b)"

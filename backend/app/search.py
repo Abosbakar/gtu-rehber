@@ -65,11 +65,30 @@ def normalize(text: str) -> list[str]:
     return [t[:5] for t in tokens if len(t) > 1 and t not in STOPWORDS]
 
 
+_LOW = "a-zçğıöşü"
+_CONSONANT = "bcçdfgğhjklmnprsştvyz"
+_VOWEL = "aeıiuüö"  # tek başına kelime olan "o" bilerek yok
+# PDF'ten çıkarılan metinde kopmuş harfler: "b ir" -> "bir", "öğrenciler e" -> "öğrencilere"
+_PREFIX_CONSONANT = re.compile(rf"(?<![{_LOW}\w])([{_CONSONANT}]) (?=[aeıioöuü][{_LOW}])")
+_SUFFIX_CONSONANT = re.compile(rf"(?<=[{_LOW}]{{2}}) ([{_CONSONANT}])(?=[\s,.;:])")
+_PREFIX_VOWEL = re.compile(rf"(?<![{_LOW}\w])([{_VOWEL}]) (?=ğ|[{_CONSONANT}]{{2}})")
+_SUFFIX_VOWEL = re.compile(rf"(?<=[{_LOW}]{{2}}) ([{_VOWEL}])(?=[\s,.;:])")
+
+
+def _fix_split_words(text: str) -> str:
+    text = re.sub(r"\bi çin\b", "için", text)
+    text = re.sub(r"\bv e\b", "ve", text)
+    text = _PREFIX_CONSONANT.sub(r"\1", text)
+    text = _PREFIX_VOWEL.sub(r"\1", text)
+    text = _SUFFIX_CONSONANT.sub(r"\1", text)
+    return _SUFFIX_VOWEL.sub(r"\1", text)
+
+
 def _clean(text: str) -> str:
     for pattern in _HEADER_PATTERNS:
         text = pattern.sub(" ", text)
     text = re.sub(r"-\n(?=[a-zçğıöşü])", "", text)  # satır sonunda bölünmüş kelimeler
-    return re.sub(r"[ \t]+", " ", text)
+    return _fix_split_words(re.sub(r"[ \t]+", " ", text))
 
 
 def _split_articles(doc: Document, text: str) -> list[tuple[str, str]]:

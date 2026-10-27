@@ -78,3 +78,14 @@ def test_sadece_onayli_deneyimler_gorunur(tmp_path):
     shown = store.approved("mazeret_sinavi")
     assert [e["text"] for e in shown] == ["Onaylı deneyim"]
     assert shown[0]["label"].startswith("Resmi değil")
+
+
+def test_deneyimler_soruya_gore_siralanir():
+    from app.assistant import _rank_experiences
+
+    items = [
+        {"id": 1, "text": "Bilgisayar stajında raporu Türkçe yazdık.", "confirmations": 5},
+        {"id": 2, "text": "Uçak mühendisliği stajı için İngilizce şablon kullanılmalı.", "confirmations": 0},
+    ]
+    ranked = _rank_experiences(items, "Uçak mühendisliği staj raporu nasıl yazılır?")
+    assert ranked[0]["id"] == 2

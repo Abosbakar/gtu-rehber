@@ -11,7 +11,7 @@ from . import deadlines, extract
 from .classifier import classify, contains, fold_words
 from .db import ExperienceStore
 from .llm import LocalLLM
-from .search import Hit, RegulationIndex
+from .search import Hit, RegulationIndex, normalize
 from .topics import Topic
 
 DISCLAIMER = (
@@ -47,8 +47,24 @@ _ILLNESS = ("hasta", "rapor", "ameliyat", "kaza", "grip", "ateş", "hastane")
 _LOSS = ("vefat", "cenaze", "kaybett", "öldü")
 
 
+MAX_EXPERIENCES = 3
+
+
 def _hit_dict(hit: Hit) -> dict:
     return asdict(hit)
+
+
+def _rank_experiences(items: list[dict], question: str) -> list[dict]:
+    """Aynı konudaki deneyimlerden soruya en çok benzeyenleri öne alır.
+
+    Benzerlik ortak kelime köklerinin sayısıdır; eşitlikte çok "ben de yaşadım" alan önce gelir.
+    """
+    terms = set(normalize(question))
+    return sorted(
+        items,
+        key=lambda e: (len(terms & set(normalize(e["text"]))), e["confirmations"]),
+        reverse=True,
+    )[:MAX_EXPERIENCES]
 
 
 def _intro(llm: LocalLLM, question: str, topic: Topic) -> str | None:
@@ -157,6 +173,6 @@ def answer(
         "deadline": deadline,
         "calendar": calendar.upcoming(deadlines.CALENDAR_KEYWORDS.get(topic.id, ()), today)
         if topic.id in deadlines.CALENDAR_KEYWORDS else [],
-        "experiences": store.approved(topic.id),
+        "experiences": _rank_experiences(store.approved(topic.id, limit=30), question),
         "petition_available": topic.level == "tam",
     }
