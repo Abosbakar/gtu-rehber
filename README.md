@@ -1,6 +1,6 @@
 # GTÜ Rehber
 
-> 🎬 **Demo videosu:** _bağlantı eklenecek_
+> 🎬 **Demo videosu:** https://youtu.be/N1kTIqeYYLw
 
 GTÜ öğrencilerinin akademik sorularına yönetmeliğe, akademik takvime ve diğer öğrencilerin deneyimlerine dayanarak cevap veren yerel yapay zekâ asistanı. Gerekli dilekçeyi de doldurulmuş PDF olarak hazırlar. İnternetteki hiçbir yapay zekâ servisine bağlanmaz; her şey kendi bilgisayarınızda, Docker içinde ve sadece işlemciyle (CPU) çalışır.
 
